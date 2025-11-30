@@ -1,0 +1,6 @@
+.secrets/
+.terraform
+*/__pycache__
+terraform/state/*
+!terraform/state/.gitkeep
+*.tfstate

@@ -1,0 +1,38 @@
+{
+  "name": "projects/lloyds-assessment-479721/alertPolicies/13771410397081695800",
+  "displayName": "Failed Deployment - ecp-data-cluster",
+  "documentation": {},
+  "userLabels": {},
+  "conditions": [
+    {
+      "name": "projects/lloyds-assessment-479721/alertPolicies/13771410397081695800/conditions/13771410397081694603",
+      "displayName": "Log match condition",
+      "conditionMatchedLog": {
+        "filter": "resource.labels.cluster_name=\"gke-ecp-data-cluster\"\r\nresource.type=\"k8s_cluster\"\r\njsonPayload.involvedObject.kind=\"Deployment\"\r\n(\r\n  jsonPayload.reason=\"Failed\" OR\r\n  jsonPayload.reason=\"FailedCreate\" OR\r\n  jsonPayload.reason=\"FailedScheduling\" OR\r\n  jsonPayload.reason=\"ProgressDeadlineExceeded\" OR\r\n  jsonPayload.reason=\"DeploymentFailed\"\r\n)"
+      }
+    }
+  ],
+  "alertStrategy": {
+    "notificationRateLimit": {
+      "period": "1800s"
+    },
+    "autoClose": "604800s",
+    "notificationPrompts": [
+      "OPENED"
+    ]
+  },
+  "combiner": "OR",
+  "enabled": true,
+  "notificationChannels": [
+    "projects/lloyds-assessment-479721/notificationChannels/4841414104426021974"
+  ],
+  "creationRecord": {
+    "mutateTime": "2025-11-30T11:49:12.897235614Z",
+    "mutatedBy": "REMOVED"
+  },
+  "mutationRecord": {
+    "mutateTime": "2025-11-30T11:49:12.897235614Z",
+    "mutatedBy": "REMOVED"
+  },
+  "severity": "CRITICAL"
+}

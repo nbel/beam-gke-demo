@@ -1,0 +1,49 @@
+{
+  "name": "projects/lloyds-assessment-479721/alertPolicies/14441169379379974499",
+  "displayName": "Node Memory Usage Over 1.5GB",
+  "documentation": {
+    "subject": "Node Memory Usage Over 1.5GB"
+  },
+  "userLabels": {},
+  "conditions": [
+    {
+      "name": "projects/lloyds-assessment-479721/alertPolicies/14441169379379974499/conditions/14441169379379977490",
+      "displayName": "VM Instance - VM Memory Used",
+      "conditionThreshold": {
+        "aggregations": [
+          {
+            "alignmentPeriod": "300s",
+            "perSeriesAligner": "ALIGN_MEAN"
+          }
+        ],
+        "comparison": "COMPARISON_GT",
+        "duration": "0s",
+        "filter": "resource.type = \"gce_instance\" AND metric.type = \"compute.googleapis.com/instance/memory/balloon/ram_used\" AND metadata.user_labels.goog-k8s-cluster-name = \"gke-ecp-data-cluster\"",
+        "thresholdValue": 1600000000,
+        "trigger": {
+          "count": 1
+        }
+      }
+    }
+  ],
+  "alertStrategy": {
+    "autoClose": "1800s",
+    "notificationPrompts": [
+      "OPENED"
+    ]
+  },
+  "combiner": "OR",
+  "enabled": true,
+  "notificationChannels": [
+    "projects/lloyds-assessment-479721/notificationChannels/4841414104426021974"
+  ],
+  "creationRecord": {
+    "mutateTime": "2025-11-30T10:55:46.903658761Z",
+    "mutatedBy": "REMOVED"
+  },
+  "mutationRecord": {
+    "mutateTime": "2025-11-30T10:55:46.903658761Z",
+    "mutatedBy": "REMOVED"
+  },
+  "severity": "WARNING"
+}

@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: beam
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: beam
+  name: app-data-sa
+  annotations:
+    iam.gke.io/gcp-service-account: gke-data-app-account@lloyds-assessment-479721.iam.gserviceaccount.com
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: beam
+  name: beam-job
+  labels:
+    app: beam-job
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: beam-job
+  template:
+    metadata:
+      labels:
+        app: beam-job
+    spec:
+      containers:
+      - name: beam-job
+        image: europe-north2-docker.pkg.dev/lloyds-assessment-479721/ecp-registry/IMAGE_PLACEHOLDER
+        imagePullPolicy: Always
+        command: ["python", "-u", "beam_pipeline.py"]
+        env:
+        - name: PROJECT_ID
+          value: "lloyds-assessment-479721"
+        args:
+          - "--streaming"
+          - "--input_subscription=projects/$(PROJECT_ID)/subscriptions/iot"
+          - "--output_table=$(PROJECT_ID).ecp_dataset.sensor_readings"
+          - "--output_path=gs://epc_raw_78904321/raw_output"
+          - "--runner=DirectRunner"
+          - "--project=$(PROJECT_ID)"
+          - "--region=europe-north2"
+          - "--temp_location=gs://epc_raw_78904321/tmp"
+          - "--staging_location=gs://epc_raw_78904321/staging"
+      serviceAccountName: app-data-sa
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: wi-debug
+  namespace: beam
+spec:
+  serviceAccountName: app-data-sa   # IMPORTANT
+  containers:
+  - name: debug
+    image: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    command: ["sleep", "3600"]

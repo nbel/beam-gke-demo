@@ -1,0 +1,40 @@
+{
+  "displayName": "Node CPU Usage Over 80%",
+  "documentation": {
+    "subject": "High CPU usage - >80%"
+  },
+  "userLabels": {},
+  "conditions": [
+    {
+      "displayName": "VM Instance - CPU utilization",
+      "conditionThreshold": {
+        "filter": "resource.type = \"gce_instance\" AND metric.type = \"compute.googleapis.com/instance/cpu/utilization\" AND metadata.user_labels.goog-k8s-cluster-name = \"gke-ecp-data-cluster\"",
+        "aggregations": [
+          {
+            "alignmentPeriod": "300s",
+            "crossSeriesReducer": "REDUCE_NONE",
+            "perSeriesAligner": "ALIGN_MEAN"
+          }
+        ],
+        "comparison": "COMPARISON_GT",
+        "duration": "0s",
+        "trigger": {
+          "count": 1
+        },
+        "thresholdValue": 0.8
+      }
+    }
+  ],
+  "alertStrategy": {
+    "autoClose": "1800s",
+    "notificationPrompts": [
+      "OPENED"
+    ]
+  },
+  "combiner": "OR",
+  "enabled": true,
+  "notificationChannels": [
+    "projects/lloyds-assessment-479721/notificationChannels/4841414104426021974"
+  ],
+  "severity": "WARNING"
+}

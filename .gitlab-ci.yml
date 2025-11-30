@@ -1,0 +1,71 @@
+image: python:3.11
+
+variables:
+  PROJECT_ID: $GCP_PROJECT_ID
+  GKE_CLUSTER: $GKE_CLUSTER_NAME
+  GKE_ZONE: $GKE_CLUSTER_ZONE
+  IMAGE_NAME: $CI_REGISTRY_IMAGE/beam-pipeline
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_DRIVER: overlay2
+  CLOUDSDK_CORE_DISABLE_PROMPTS: 1
+
+services:
+  - docker:dind
+
+stages:
+  - lint
+  - test
+  - build
+  - deploy
+
+
+
+lint:
+  stage: lint
+  script:
+    - curl -sSL https://sdk.cloud.google.com | bash
+    - source "$HOME/google-cloud-sdk/path.bash.inc"
+    - python -m venv venv
+    - source venv/bin/activate
+    - pip install -r ./beam_pipeline/requirements.txt
+    - black --check .
+    - ruff check .
+
+tests:
+  stage: test
+  script:
+    - export PYTHONPATH="$CI_PROJECT_DIR"
+    - curl -sSL https://sdk.cloud.google.com | bash
+    - source "$HOME/google-cloud-sdk/path.bash.inc"
+    - python -m venv venv
+    - source venv/bin/activate
+    - pip install -r ./beam_pipeline/requirements.txt
+    - pytest -q
+
+build:
+  stage: build
+  image: google/cloud-sdk:latest
+  services:
+    - docker:24.0-dind
+  variables:
+    DOCKER_HOST: "tcp://docker:2375"
+    DOCKER_TLS_CERTDIR: ""
+  before_script:
+    - apt-get update -y
+    - apt-get install -y docker.io
+    - gcloud auth activate-service-account --key-file="$GCP_SERVICE_ACCOUNT_KEY"
+    - gcloud auth configure-docker $CONTAINER_REGISTRY_REGION --quiet
+  script:
+    - docker build -t "$CONTAINER_REGISTRY_REGION/$GCP_PROJECT_ID/$CONTAINER_REGISTRY/$IMAGE_NAME:$CI_COMMIT_SHA" .
+    - docker push "$CONTAINER_REGISTRY_REGION/$GCP_PROJECT_ID/$CONTAINER_REGISTRY/$IMAGE_NAME:$CI_COMMIT_SHA"
+
+deploy:
+  stage: deploy
+  image: google/cloud-sdk:latest
+  script:
+    - gcloud auth activate-service-account --key-file="$GCP_SERVICE_ACCOUNT_KEY"
+    - gcloud config set project $GCP_PROJECT_ID
+    - gcloud container clusters get-credentials $GKE_CLUSTER --zone $GKE_ZONE
+    - sed "s|IMAGE_PLACEHOLDER|$IMAGE_NAME:$CI_COMMIT_SHA|g" kube-manifest.yml | kubectl apply -f -
+#  only:
+#    - main

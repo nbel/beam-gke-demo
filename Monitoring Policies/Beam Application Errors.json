@@ -1,0 +1,37 @@
+{
+  "name": "projects/lloyds-assessment-479721/alertPolicies/10031650794397948033",
+  "displayName": "Beam Application Errors",
+  "documentation": {},
+  "userLabels": {},
+  "conditions": [
+    {
+      "name": "projects/lloyds-assessment-479721/alertPolicies/10031650794397948033/conditions/10031650794397947898",
+      "displayName": "Log match condition",
+      "conditionMatchedLog": {
+        "filter": "resource.labels.cluster_name=\"gke-ecp-data-cluster\"\nseverity=\"ERROR\"\nresource.type=\"k8s_container\""
+      }
+    }
+  ],
+  "alertStrategy": {
+    "notificationRateLimit": {
+      "period": "3600s"
+    },
+    "autoClose": "604800s",
+    "notificationPrompts": [
+      "OPENED"
+    ]
+  },
+  "combiner": "OR",
+  "enabled": true,
+  "notificationChannels": [
+    "projects/lloyds-assessment-479721/notificationChannels/4841414104426021974"
+  ],
+  "creationRecord": {
+    "mutateTime": "2025-11-30T12:36:38.066620094Z",
+    "mutatedBy": "REMOVED"
+  },
+  "mutationRecord": {
+    "mutateTime": "2025-11-30T12:36:38.066620094Z",
+    "mutatedBy": "REMOVED"
+  }
+}
