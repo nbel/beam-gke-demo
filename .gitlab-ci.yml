@@ -58,7 +58,9 @@ build:
   script:
     - docker build -t "$CONTAINER_REGISTRY_REGION/$GCP_PROJECT_ID/$CONTAINER_REGISTRY/$IMAGE_NAME:$CI_COMMIT_SHA" .
     - docker push "$CONTAINER_REGISTRY_REGION/$GCP_PROJECT_ID/$CONTAINER_REGISTRY/$IMAGE_NAME:$CI_COMMIT_SHA"
-
+  only:
+    - main
+    
 deploy:
   stage: deploy
   image: google/cloud-sdk:latest
@@ -67,5 +69,5 @@ deploy:
     - gcloud config set project $GCP_PROJECT_ID
     - gcloud container clusters get-credentials $GKE_CLUSTER --zone $GKE_ZONE
     - sed "s|IMAGE_PLACEHOLDER|$IMAGE_NAME:$CI_COMMIT_SHA|g" kube-manifest.yml | kubectl apply -f -
-#  only:
-#    - main
+  only:
+    - main
